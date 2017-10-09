@@ -1,0 +1,8 @@
+# Generated folder
+node_modules
+
+# OSX artifact
+.DS_Store
+
+# Transpiled files
+dist
