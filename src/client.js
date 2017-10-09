@@ -13,7 +13,7 @@ import { logStr, logMsg } from './io'
  */
 export default curry((port, name) =>
   compose(
-    tap(() => console.log(`Starting websocket client on ${port} and name ${name}`)),
+    logStr(`Starting websocket client on ${port} and name ${name}`),
     listenMessages,
     openConnection(name),
     initClient

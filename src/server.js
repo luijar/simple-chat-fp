@@ -20,7 +20,7 @@ const users = []
 // Driver
 export default curry((port, name) =>
   compose(
-    tap(() => console.log(`Started Websocket server on port ${port} and server name ${name}`)),
+    logStr(`Started Websocket server on port ${port} and server name ${name}`),
     listenConnections,
     initServer
   )(port)
