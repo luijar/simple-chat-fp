@@ -30,7 +30,8 @@ const listenMessages = on('message', handleMessage)
 
 const handleOpen = curry((name, ws) => {
   return function open() { // Note: Could not use curry when calling a no-arg function at the end
-    ws.send(composeMessage(name, `Hello! This is ${name}`))
+    ws.send(composeMessage(name, `Hello! This is ${name}`)) // Use an IO monad to drive this side effect an ap
+
     const stdin = process.openStdin()
     stdin.addListener("data", function(data) {
     // note:  data is an object, and when converted to a string it will
