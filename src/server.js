@@ -28,9 +28,17 @@ export default curry((port, name) =>
 
 const send = curry((msg, connection) => connection.send(composeMessage('server', msg)) || msg)
 
-const broadcast = curry((connectionsProvider, msg) => head(map(send(msg), connectionsProvider())))
+// Send a message out to any open connections
+// broadcast :: ( () -> Array) -> String -> String
+const broadcast = curry((connectionsProvider, msg) => tap(() => map(send(msg), connectionsProvider())))
 
-const addToHistory = curry((history, msg) => history.push(History(Date.now(), msg)))
+// Add new message to global history
+// addToHistory :: Array -> String -> Number
+const addToHistory = curry((history, h) => history.push(h))
+
+// Convert a new message to history
+// asHistory :: String -> History
+const asHistory = (msg) => History(Date.now(), msg)
 
 // Handle incomming mesage, and emit to all other connections
 // This function contains a side effect upon exit
@@ -38,10 +46,9 @@ const addToHistory = curry((history, msg) => history.push(History(Date.now(), ms
 const emitMessage = curry((server, connection) =>
    compose(
      orElse(logStr),
-     map(logStr),
-     map(addToHistory(history)),
-     map(broadcast(() => filter(c => c !== connection && c.readyState === WebSocket.OPEN, Array.from(server.clients)))),
-     //map(tap(message => console.log(`Received message "${message}"`))),
+     //map(logStr),
+     map(compose(addToHistory(history), asHistory)),
+     map(broadcast(() => filter(c => c !== connection && c.readyState === WebSocket.OPEN, Array.from(server.clients)))),     
      isMessageValid,
      JSON.parse
    )
@@ -54,14 +61,14 @@ const listenConnections = on('connection', handleConnection)
 const initServer = port => new WebSocket.Server({ port })
 
 // Handle exit event
-// Array.from(['exit', 'SIGINT']).forEach(e => {
-//   process.on(e, () => {
-//     //TODO: Write to file
-//     console.log(
-//       foldM(History)(history)
-//          .bimap(prettyDate, cleanUp)
-//          //.bimap(identity, toFile)
-//          .toString())
-//     process.exit()
-//   })
-// })
+Array.from(['exit', 'SIGINT']).forEach(e => {
+  process.on(e, () => {
+    //TODO: Write to file
+    console.log(
+      foldM(History)(history)
+         .bimap(prettyDate, cleanUp)
+         //.bimap(identity, toFile)
+         .toString())
+    process.exit()
+  })
+})
