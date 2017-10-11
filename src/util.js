@@ -1,19 +1,25 @@
 /**
- *
- * Package of utility functions
+ * Module containing utility (helper) functions
  */
-
-import { History } from './history'
-import { tap, curry } from 'ramda'
+import { tap, curry, is, type } from 'ramda'
 
 export const prettyDate = timeMs => (new Date(timeMs)).toString()
-
-export const cleanUp = log => log.replace(new RegExp(`\\${History.separator}`, 'g'), '\n')
 
 export function foldM(M) {
   return arr =>
     arr.reduce((acc, m) => acc.concat(m), M.empty())
 }
+
+export const typeErr = (name, cond) => {
+  if(!cond) {
+    throw new TypeError(`Wrong type used: ${name}`)
+  }
+  return cond
+}
+
+export const fork = (join, func1, func2) => val => join(func1(val), func2(val))
+
+export const typeOf = T => tap(fork(typeErr, type, is(T)))
 
 export const orElse = f => F => F.orElse(f)
 

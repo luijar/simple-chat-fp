@@ -1,8 +1,8 @@
 import WebSocket from 'ws'
 import { compose, map, tap, curry, forEach, filter, head, identity, defaultTo, prop } from 'ramda'
 import isMessageValid from './validation'
-import { History } from './history'
-import { cleanUp,  prettyDate, foldM, orElse, on, composeMessage } from './util'
+import { History, cleanUp } from './history'
+import { prettyDate, foldM, orElse, on, composeMessage } from './util'
 import { logStr } from './io'
 
 /**
@@ -18,6 +18,7 @@ const history = []  // use immutable list?
 const users = []
 
 // Driver
+// Initialize server and begin listening for new connections
 export default curry((port, name) =>
   compose(
     logStr(`Started Websocket server on port ${port} and server name ${name}`),
@@ -38,7 +39,7 @@ const addToHistory = curry((history, h) => history = history.push(h))
 
 // Convert a new message to history
 // asHistory :: String -> History
-const asHistory = msg => History(Date.now(), msg)
+const asHistory = msg => History([Date.now()], [msg])
 
 // Handle incomming mesage, and emit to all other connections
 // This function contains a side effect upon exit
@@ -64,12 +65,12 @@ const listenConnections = on('connection', handleConnection)
 const initServer = port => new WebSocket.Server({ port })
 
 // Handle exit event
-Array.from(['exit', 'SIGINT']).forEach(e => {
+Array.from(['SIGINT']).forEach(e => {
   process.on(e, () => {
     //TODO: Write to file
     console.log(
       foldM(History)(history)
-         .bimap(prettyDate, cleanUp)
+         //.bimap(prettyDate, cleanUp)
          //.bimap(identity, toFile)
          .toString())
     process.exit()

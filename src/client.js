@@ -11,6 +11,10 @@ import { logStr, logMsg } from './io'
  * wscat -c ws://echo.websocket.org
  * @see http://websockets.github.io/ws/
  */
+
+// Driver
+// Initialize WebSocket client, open a connection with a listening server,
+// and send/respond-to messages
 export default curry((port, name) =>
   compose(
     logStr(`Starting websocket client on ${port} and name ${name}`),
