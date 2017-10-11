@@ -33,8 +33,8 @@ const send = curry((msg, connection) => connection.send(composeMessage('server',
 const broadcast = curry((connectionsProvider, msg) => defaultTo(msg, head(map(send(msg), connectionsProvider()))))
 
 // Add new message to global history
-// addToHistory :: Array -> String -> Number
-const addToHistory = curry((history, h) => history.push(h))
+// addToHistory :: Array -> History -> Number
+const addToHistory = curry((history, h) => history = history.push(h))
 
 // Convert a new message to history
 // asHistory :: String -> History
