@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { compose, map, tap, curry, forEach, filter, head, identity } from 'ramda'
+import { compose, map, tap, curry, forEach, filter, head, identity, defaultTo, prop } from 'ramda'
 import isMessageValid from './validation'
 import { History } from './history'
 import { cleanUp,  prettyDate, foldM, orElse, on, composeMessage } from './util'
@@ -14,7 +14,7 @@ import { logStr } from './io'
 */
 
 // Store all conversation history
-const history = []
+const history = []  // use immutable list?
 const users = []
 
 // Driver
@@ -30,7 +30,7 @@ const send = curry((msg, connection) => connection.send(composeMessage('server',
 
 // Send a message out to any open connections
 // broadcast :: ( () -> Array) -> String -> String
-const broadcast = curry((connectionsProvider, msg) => tap(() => map(send(msg), connectionsProvider())))
+const broadcast = curry((connectionsProvider, msg) => defaultTo(msg, head(map(send(msg), connectionsProvider()))))
 
 // Add new message to global history
 // addToHistory :: Array -> String -> Number
@@ -38,7 +38,7 @@ const addToHistory = curry((history, h) => history.push(h))
 
 // Convert a new message to history
 // asHistory :: String -> History
-const asHistory = (msg) => History(Date.now(), msg)
+const asHistory = msg => History(Date.now(), msg)
 
 // Handle incomming mesage, and emit to all other connections
 // This function contains a side effect upon exit
@@ -46,9 +46,12 @@ const asHistory = (msg) => History(Date.now(), msg)
 const emitMessage = curry((server, connection) =>
    compose(
      orElse(logStr),
-     //map(logStr),
-     map(compose(addToHistory(history), asHistory)),
-     map(broadcast(() => filter(c => c !== connection && c.readyState === WebSocket.OPEN, Array.from(server.clients)))),     
+     map(compose(addToHistory(history), asHistory, JSON.stringify)),
+     map(broadcast(() =>
+        // Use a thunk here to make this operation lazy
+        Array.from(server.clients)
+             .filter(c => c !== connection && c.readyState === WebSocket.OPEN))
+     ),
      isMessageValid,
      JSON.parse
    )
