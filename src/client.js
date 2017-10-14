@@ -14,6 +14,8 @@ import { logStr, logMsg } from './io'
  * @see http://websockets.github.io/ws/
  */
 
+const prompt = 'chat > '
+
 // Driver
 // Initialize WebSocket client, open a connection with a listening server,
 // and send/respond-to messages
@@ -26,22 +28,21 @@ export default curry((port, name) =>
   )(port)
 )
 
-const rl = readline.createInterface(process.stdin, process.stdout)
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  prompt
+})
 
 const handleMessage = connection =>
   compose(
-    //() => prompt(rl),
+    () => rl.prompt(),
     logMsg,
     JSON.parse
   )
 
 const listenMessages = on('message', handleMessage)
 
-const prompt = rl => {
-  const p = 'chat >'
-  rl.setPrompt(p, p.length)
-  rl.prompt();
-}
 
 const handleOpen = curry((name, ws) => {
   return function open() { // Note: Could not use curry when calling a no-arg function at the end
@@ -50,14 +51,13 @@ const handleOpen = curry((name, ws) => {
     rl.on('line', function (data) {
       ws.send(composeMessage(name, data.toString().trim()))
 
-      // prompt for next message
-      prompt(rl)
+      rl.prompt()
 
     }).on('close', function() {
-      console.log('Have a great day!')
+      logMsg('Have a great day!')
       process.exit(0)
     })
-    prompt(rl)
+    rl.prompt()
   }
 })
 
