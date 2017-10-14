@@ -1,5 +1,6 @@
 import WebSocket from 'ws'
 import { compose, map, tap, curry, forEach, filter, head, identity, defaultTo, prop } from 'ramda'
+import Task from 'data.task'
 import isMessageValid from './validation'
 import { History, cleanUp } from './history'
 import { prettyDate, foldM, orElse, on, composeMessage } from './util'
@@ -39,7 +40,7 @@ const addToHistory = curry((history, h) => history = history.push(h))
 
 // Convert a new message to history
 // asHistory :: String -> History
-const asHistory = msg => History([Date.now()], msg)
+const asHistory = msg => History([{time: Date.now(), type: 'text/plain'}], msg)
 
 // Adds a dividor between each log for ease of parsing
 // formatLog :: String -> String
@@ -72,13 +73,11 @@ const initServer = port => new WebSocket.Server({ port })
 Array.from(['SIGINT']).forEach(e => {
   process.on(e, () => {
     //TODO: Write to file
-    console.log(
       // Fold (reduce) all history into one
       foldM(History)(history)
-         // Format the history
-         .bimap(map(prettyDate), cleanUp)
-         //.bimap(identity, toFile)
-         .toString())
+         // Format the history log
+         .bimap(Array, String)(compose(map(prettyDate), map(prop('time'))), cleanUp)
+         .merge((a,b) => console.log(a,b))
     process.exit()
   })
 })
