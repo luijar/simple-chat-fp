@@ -26,30 +26,41 @@ export default curry((port, name) =>
   )(port)
 )
 
+const rl = readline.createInterface(process.stdin, process.stdout)
+
 const handleMessage = connection =>
   compose(
+    //() => prompt(rl),
     logMsg,
     JSON.parse
   )
 
 const listenMessages = on('message', handleMessage)
 
+const prompt = rl => {
+  const p = 'chat >'
+  rl.setPrompt(p, p.length)
+  rl.prompt();
+}
+
 const handleOpen = curry((name, ws) => {
   return function open() { // Note: Could not use curry when calling a no-arg function at the end
     ws.send(composeMessage(name, `Hello! This is ${name}`)) // Use an IO monad to drive this side effect an ap
 
-    const rl = readline.createInterface(process.stdin, process.stdout)
     rl.on('line', function (data) {
       ws.send(composeMessage(name, data.toString().trim()))
 
       // prompt for next message
-      rl.setPrompt('>', 1)
-      rl.prompt();
-    });
-    rl.setPrompt('>', 1)
-    rl.prompt();
+      prompt(rl)
+
+    }).on('close', function() {
+      console.log('Have a great day!')
+      process.exit(0)
+    })
+    prompt(rl)
   }
 })
+
 
 // Open the client connection
 // openConnection :: String -> (String, Function, WebSocket -> ()) -> WebSocket
