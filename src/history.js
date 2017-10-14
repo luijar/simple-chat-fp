@@ -22,8 +22,8 @@ const Pair = (A, B) => (left, right) =>
 // History :: (a, b) -> Object
 export const History = Pair(Array, String)
 History.empty = () => History([], '') // First empty log with empty value
-
-export const cleanUp = log => log.replace(new RegExp(`\\.`, 'g'), '\n')
+History.separator = '|'
+export const cleanUp = log => log.replace(new RegExp(`\\${History.separator}`, 'g'), '\n')
 
 
 

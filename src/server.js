@@ -21,7 +21,7 @@ const users = []
 // Initialize server and begin listening for new connections
 export default curry((port, name) =>
   compose(
-    logStr(`Started Websocket server on port ${port} and server name ${name}`),
+    logStr(`Started Websocket server on port ${port} and server name ${name}. You can terminate the program at any time by pressing Ctrl + C`),
     listenConnections,
     initServer
   )(port)
@@ -41,13 +41,17 @@ const addToHistory = curry((history, h) => history = history.push(h))
 // asHistory :: String -> History
 const asHistory = msg => History([Date.now()], msg)
 
+// Adds a dividor between each log for ease of parsing
+// formatLog :: String -> String
+const formatLog = msg => msg + History.separator
+
 // Handle incomming mesage, and emit to all other connections
 // This function contains a side effect upon exit
 // emitMessage :: WebSocketServer -> WebSocket -> String -> Void
 const emitMessage = curry((server, connection) =>
    compose(
      orElse(logStr),
-     map(compose(addToHistory(history), asHistory, JSON.stringify)),
+     map(compose(addToHistory(history), asHistory, formatLog, JSON.stringify)),
      map(broadcast(() =>
         // Use a thunk here to make this operation lazy
         Array.from(server.clients)
@@ -64,13 +68,15 @@ const listenConnections = on('connection', handleConnection)
 
 const initServer = port => new WebSocket.Server({ port })
 
-// Handle exit event
+// Handle exit event and dump the history into a log file
 Array.from(['SIGINT']).forEach(e => {
   process.on(e, () => {
     //TODO: Write to file
     console.log(
+      // Fold (reduce) all history into one
       foldM(History)(history)
-         //.bimap(prettyDate, cleanUp)
+         // Format the history
+         .bimap(map(prettyDate), cleanUp)
          //.bimap(identity, toFile)
          .toString())
     process.exit()
