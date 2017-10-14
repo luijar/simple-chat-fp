@@ -1,12 +1,8 @@
 import { curry } from 'ramda'
-import { typeOf } from './util'
+import { typeOf, contractOf } from './util'
 
-/**
- * Typed 2-tuple (pair) of monoids
- *
- * @param {A} left  Any monoidal type
- * @param {B} right Any monoidal type
- */
+// Typed 2-tuple (pair) of monoids
+// Pair :: (A, B) -> (a, b) -> Object
 const Pair = (A, B) => (left, right) =>
     ((left, right) => (
       {
@@ -18,19 +14,16 @@ const Pair = (A, B) => (left, right) =>
         foldR: (_, g) => g(right),
         toString: () => `Pair [${left}, ${right}]`,
       })
-    )(typeOf(A)(left), typeOf(B)(right))
+      // Check proper right and contract
+    )(typeOf(A)(left) && contractOf('concat')(left), typeOf(B)(right) && contractOf('concat')(right))
 
-/**
- * History monoid
- *
- * @param {Number} time Timestamp (also monoidal)
- * @param {String} log  Log string (also monoidal)
- */
-export const History = Pair(Array, Array)
-History.empty = () => History([], [])
-History.separator = '|'
 
-export const cleanUp = log => log.replace(new RegExp(`\\${History.separator}`, 'g'), '\n')
+// History pair with a log (Array) on the left, and a String value on the right
+// History :: (a, b) -> Object
+export const History = Pair(Array, String)
+History.empty = () => History([], '') // First empty log with empty value
+
+export const cleanUp = log => log.replace(new RegExp(`\\.`, 'g'), '\n')
 
 
 

@@ -39,7 +39,7 @@ const addToHistory = curry((history, h) => history = history.push(h))
 
 // Convert a new message to history
 // asHistory :: String -> History
-const asHistory = msg => History([Date.now()], [msg])
+const asHistory = msg => History([Date.now()], msg)
 
 // Handle incomming mesage, and emit to all other connections
 // This function contains a side effect upon exit
