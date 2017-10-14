@@ -1,7 +1,9 @@
 import WebSocket from 'ws'
+import readline from 'readline'
 import { compose, curry, curryN, tap } from 'ramda'
 import { cleanUp,  prettyDate, foldM, orElse, on, composeMessage } from './util'
 import { logStr, logMsg } from './io'
+
 
 /**
  * Chat client
@@ -36,13 +38,16 @@ const handleOpen = curry((name, ws) => {
   return function open() { // Note: Could not use curry when calling a no-arg function at the end
     ws.send(composeMessage(name, `Hello! This is ${name}`)) // Use an IO monad to drive this side effect an ap
 
-    const stdin = process.openStdin()
-    stdin.addListener("data", function(data) {
-    // note:  data is an object, and when converted to a string it will
-    // end with a linefeed.  so we (rather crudely) account for that
-    // with toString() and then trim()
+    const rl = readline.createInterface(process.stdin, process.stdout)
+    rl.on('line', function (data) {
       ws.send(composeMessage(name, data.toString().trim()))
-    })
+
+      // prompt for next message
+      rl.setPrompt('>', 1)
+      rl.prompt();
+    });
+    rl.setPrompt('>', 1)
+    rl.prompt();
   }
 })
 
