@@ -1,6 +1,5 @@
 import WebSocket from 'ws'
 import { compose, map, tap, curry, forEach, filter, head, identity, defaultTo, prop } from 'ramda'
-import Task from 'data.task'
 import isMessageValid from './validation'
 import { History, cleanUp } from './history'
 import { prettyDate, foldM, orElse, on, composeMessage } from './util'
@@ -71,7 +70,7 @@ const initServer = port => new WebSocket.Server({ port })
 
 // Handle exit event and dump the history into a log file
 Array.from(['SIGINT']).forEach(e => {
-  process.on(e, () => {
+  process.on(e, () => {  
     //TODO: Write to file
       // Fold (reduce) all history into one
       foldM(History)(history)
