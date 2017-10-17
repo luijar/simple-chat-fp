@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { History } from '../src/history'
-import { typeOf } from '../src/util'
+import { History } from '../src/server/history'
+import { typeOf } from '../src/shared/util'
 
 describe('History Test Suite', () => {
   it('Should create an empty History object', () => {

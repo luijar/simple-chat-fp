@@ -1,8 +1,8 @@
 import WebSocket from 'ws'
 import readline from 'readline'
 import { compose, curry, curryN, tap } from 'ramda'
-import { cleanUp,  prettyDate, foldM, orElse, on, composeMessage } from './util'
-import { logStr, logMsg } from './io'
+import { cleanUp,  prettyDate, foldM, orElse, on, composeMessage } from '../shared/util'
+import { logStr, logMsg } from '../shared/io'
 
 
 /**
@@ -34,6 +34,8 @@ const rl = readline.createInterface({
   prompt
 })
 
+// use a contravariant that can accept messages, apply some behavior, then keep listening for messages
+
 const handleMessage = connection =>
   compose(
     () => rl.prompt(),
@@ -50,10 +52,9 @@ const handleOpen = curry((name, ws) => {
 
     rl.on('line', function (data) {
       ws.send(composeMessage(name, data.toString().trim()))
-
       rl.prompt()
-
-    }).on('close', function() {
+    })
+     .on('close', function() {
       logMsg('Have a great day!')
       process.exit(0)
     })
