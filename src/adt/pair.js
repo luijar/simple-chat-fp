@@ -1,4 +1,5 @@
 import { curry, tap, is, has, compose, type } from 'ramda'
+import { fork } from '../shared/util'
 
 // Use either?
 const typeErr = curry((name, cond) => {
@@ -15,8 +16,6 @@ const contractErr = curry((name, cond) => {
   }
   return cond
 })
-
-export const fork = (join, func1, func2) => val => join(func1(val), func2(val))
 
 // Checks if the provided object of type T
 // typeOf :: T -> a -> a | Error

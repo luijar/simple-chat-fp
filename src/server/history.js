@@ -8,14 +8,12 @@ ConcatNum.prototype.concat = function (other) {
 
 Object.assign(Number.prototype, ConcatNum.prototype)
 
-// History pair with a log (Array) on the left, and a String value on the right
-// History :: (a, b) -> Object
-export const History = Pair(Number, String)
-History.empty = () => History(0, '') // First empty log with empty value
-History.separator = '|'
+// History pair with the log (String) on the left, and an Array value on the right to the values logged
+// History :: (a, b) -> History
+const HistoryLog = Pair(String, Array)
+HistoryLog.empty = () => HistoryLog('', []) // First empty log with empty value
+HistoryLog.separator = '|'
 
-export const cleanUp = log => log.replace(new RegExp(`\\${History.separator}`, 'g'), '\n')
+export default HistoryLog
 
-
-
-// Sort backwards with a profunctor or contramap
+// TODO: Sort backwards with a profunctor or contramap

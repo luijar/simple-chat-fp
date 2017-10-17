@@ -17,3 +17,5 @@ export const orElse = f => F => F.orElse(f)
 export const on = curry((event, handler, handle) => handle.on(event, handler(handle)))
 
 export const composeMessage = curry((name, msg) => JSON.stringify({name, msg}))
+
+export const fork = (join, func1, func2) => val => join(func1(val), func2(val))

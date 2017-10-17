@@ -1,10 +1,10 @@
 import WebSocket from 'ws'
 import { compose, map, tap, curry, forEach, filter, head, identity, defaultTo, prop } from 'ramda'
-import isMessageValid from './validation'
-import { History, cleanUp } from './history'
-import { prettyDate, foldM, orElse, on, composeMessage } from '../shared/util'
+import { prettyDate, foldM, orElse, on, composeMessage, fork } from '../shared/util'
 import { logStr } from '../shared/io'
 import { store, addHistory } from './store'
+import isMessageValid from './validation'
+import HistoryLog from './history'
 
 /**
 * Chat Server
@@ -36,11 +36,11 @@ const storeNewHistory = curry((store, h) => store.dispatch(addHistory(h)))
 
 // Convert a new message to history
 // asHistory :: String -> History
-const asHistory = msg => History(Date.now(), msg)
+const asHistory = ({name, msg}) => HistoryLog(`New message received from user ${name}\n`, [{time: Date.now(), msg}])
 
-// Adds a dividor between each log for ease of parsing
+// Adds some formatting to log
 // formatLog :: String -> String
-const formatLog = msg => msg + History.separator
+const formatLog = identity  // for now keep the same
 
 // Handle incomming mesage, and emit to all other connections
 // This function contains a side effect upon exit
@@ -48,7 +48,7 @@ const formatLog = msg => msg + History.separator
 const emitMessage = curry((store, server, connection) =>
    compose(
      orElse(logStr),
-     map(compose(storeNewHistory(store), asHistory, formatLog, JSON.stringify)),
+     map(compose(storeNewHistory(store), asHistory, formatLog)),  //TODO: map a lens over the msg attr to JSON.stringify
      map(broadcast(() =>
         // Use a thunk here to make this operation lazy
         Array.from(server.clients)
@@ -65,14 +65,18 @@ const listenConnections = store => on('connection', handleConnection(store))
 
 const initServer = port => new WebSocket.Server({ port })
 
-const render = () => {
-  console.log(store.getState())
+const render = history => {
     //TODO: Write to file
+    // return an IO from render
     // Fold (reduce) all history into one
-    // foldM(History)(store.getState()['history'])
-    //    // Format the history log
-    //    //.bimap(Array, String)(compose(map(prettyDate), map(prop('time'))), cleanUp)
-    //    .merge((a,b) => console.log(a,b))
+    foldM(HistoryLog)(history)
+       // Format the history log
+       .bimap(String, Array)(identity, map(fork(
+         (a, b) => `${a}: ${b}`,
+         compose(prettyDate, prop('time')),
+         prop('msg')))
+       )
+       .merge((a,b) => console.log(a,b))
 }
 
 const unsubscribe = store.subscribe(render)
@@ -80,7 +84,8 @@ const unsubscribe = store.subscribe(render)
 // Handle exit event and dump the history into a log file
 Array.from(['SIGINT']).forEach(e => {
   process.on(e, () => {
-    render()
+    // TODO: wrap all of these effects into an IO
+    render(store.getState()['history'])
     unsubscribe()
     process.exit()
   })
