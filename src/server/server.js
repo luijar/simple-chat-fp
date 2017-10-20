@@ -71,10 +71,12 @@ const render = history => {
     // Fold (reduce) all history into one
     foldM(HistoryLog)(history)
        // Format the history log
-       .bimap(String, Array)(identity, map(fork(
-         (a, b) => `${a}: ${b}`,
-         compose(prettyDate, prop('time')),
-         prop('msg')))
+       .bimap(String, Array)(identity, map(
+         fork(
+           (a, b) => `${a}: ${b}`,
+           compose(prettyDate, prop('time')),
+           prop('msg'))
+         )
        )
        .merge((a,b) => console.log(a,b))
 }
