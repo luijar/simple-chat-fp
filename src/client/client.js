@@ -63,6 +63,7 @@ const handleOpen = curry((name, ws) => {
 })
 
 
+
 // Open the client connection
 // openConnection :: String -> (String, Function, WebSocket -> ()) -> WebSocket
 const openConnection = name => tap(on('open', handleOpen(name)))

@@ -65,18 +65,16 @@ const listenConnections = store => on('connection', handleConnection(store))
 
 const initServer = port => new WebSocket.Server({ port })
 
-const render = history => {
+const render = () => {
     //TODO: Write to file
     // return an IO from render
     // Fold (reduce) all history into one
-    foldM(HistoryLog)(history)
+    foldM(HistoryLog)(store.getState()['history'])
        // Format the history log
-       .bimap(String, Array)(identity, map(
-         fork(
-           (a, b) => `${a}: ${b}`,
-           compose(prettyDate, prop('time')),
-           prop('msg'))
-         )
+       .bimap(String, Array)(identity, map(fork(
+         (a, b) => `${a}: ${b}`,
+         compose(prettyDate, prop('time')),
+         prop('msg')))
        )
        .merge((a,b) => console.log(a,b))
 }
