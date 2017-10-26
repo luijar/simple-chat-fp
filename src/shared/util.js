@@ -21,3 +21,11 @@ export const composeMessage = curry((name, msg) => JSON.stringify({name, msg}))
 export const fork = (join, func1, func2) => val => join(func1(val), func2(val))
 
 export const seq = (...fns) => val => fns.forEach(f => f(val))
+
+// Takes any string and returns an effectful computation that
+// lazily wraps the console log of that message
+export const logStr = str => () => console.log(str)
+
+// Takes a message object and returns an effectul computation that
+// lazily wraps the console log of that message
+export const logMsg = msg => console.log(`${msg.name}: ${msg.msg}`)

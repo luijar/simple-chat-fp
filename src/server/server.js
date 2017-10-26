@@ -1,7 +1,6 @@
 import WebSocket from 'ws'
 import { join, compose, map, tap, curry, forEach, filter, head, identity, defaultTo, prop } from 'ramda'
-import { prettyDate, foldM, orElse, on, composeMessage, fork } from '../shared/util'
-import { logStr } from '../shared/io'
+import { prettyDate, foldM, orElse, on, composeMessage, fork, logStr } from '../shared/util'
 import { store, addHistory } from './store'
 import isMessageValid from './validation'
 import HistoryLog from './history'

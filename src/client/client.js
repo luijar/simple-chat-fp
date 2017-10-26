@@ -1,8 +1,7 @@
 import WebSocket from 'ws'
 import readline from 'readline'
 import { compose, curry, curryN, tap, prop, chain } from 'ramda'
-import { composeMessage, on } from '../shared/util'
-import { logMsg, logStr } from '../shared/io'
+import { composeMessage, on, logMsg, logStr } from '../shared/util'
 import IO from 'io-monad'
 
 /**
@@ -41,7 +40,7 @@ const reader = readline.createInterface({
 const handleMessage = connection =>
   compose(
     // Run the effect
-    IO.runIO,    
+    IO.runIO,
     // At the end prompt the user using the configured CLI reader
     chain(promptUser(reader)),
     // tap(io => console.log('Debug', io)),
