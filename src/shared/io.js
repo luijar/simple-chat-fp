@@ -1,11 +1,15 @@
-import { tap } from 'ramda'
+import { tap, compose, is } from 'ramda'
+import IO from 'io-monad'
 
 /**
  * Package of functions that perform side effects
  */
+// Takes any string and returns an effectful computation that
+// lazily wraps the console log of that message
+export const logStr = str => () => console.log(str)
 
-export const logStr = str => tap(() => console.log(str))
+// Takes a message object and returns an effectul computation that
+// lazily wraps the console log of that message
+export const logMsg = msg => console.log(`${msg.name}: ${msg.msg}`)
 
-export const logMsg = tap(({msg}) => console.log(`${msg.name}: ${msg.msg}`))
-
-// Write to file
+// TODO: Log to file

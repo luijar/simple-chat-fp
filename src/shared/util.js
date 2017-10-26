@@ -1,7 +1,7 @@
 /**
  * Module containing utility (helper) functions
  */
-import { curry } from 'ramda'
+import { curry, identity } from 'ramda'
 
 export const prettyDate = timeMs => (new Date(timeMs)).toString()
 
@@ -19,3 +19,5 @@ export const on = curry((event, handler, handle) => handle.on(event, handler(han
 export const composeMessage = curry((name, msg) => JSON.stringify({name, msg}))
 
 export const fork = (join, func1, func2) => val => join(func1(val), func2(val))
+
+export const seq = (...fns) => val => fns.forEach(f => f(val))

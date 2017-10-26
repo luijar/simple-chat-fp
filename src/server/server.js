@@ -1,10 +1,11 @@
 import WebSocket from 'ws'
-import { compose, map, tap, curry, forEach, filter, head, identity, defaultTo, prop } from 'ramda'
+import { join, compose, map, tap, curry, forEach, filter, head, identity, defaultTo, prop } from 'ramda'
 import { prettyDate, foldM, orElse, on, composeMessage, fork } from '../shared/util'
 import { logStr } from '../shared/io'
 import { store, addHistory } from './store'
 import isMessageValid from './validation'
 import HistoryLog from './history'
+import IO from 'io-monad'
 
 /**
 * Chat Server
@@ -18,6 +19,8 @@ import HistoryLog from './history'
 // Initialize server and begin listening for new connections
 export default curry((port, name) =>
   compose(
+    IO.runIO,
+    IO.of,
     logStr(`Started Websocket server on port ${port} and server name ${name}. You can terminate the program at any time by pressing Ctrl + C`),
     listenConnections(store),
     initServer
@@ -47,7 +50,7 @@ const formatLog = identity  // for now keep the same
 // emitMessage :: Store -> WebSocketServer -> WebSocket -> String -> Void
 const emitMessage = curry((store, server, connection) =>
    compose(
-     orElse(logStr),
+     orElse(compose(IO.runIO, IO.of, logStr, join('\n'))),
      map(compose(storeNewHistory(store), asHistory, formatLog)),  //TODO: map a lens over the msg attr to JSON.stringify
      map(broadcast(() =>
         // Use a thunk here to make this operation lazy
