@@ -42,7 +42,7 @@ const handleMessage = connection =>
     // Run the effect
     IO.runIO,
     // At the end prompt the user using the configured CLI reader
-    chain(promptUser(reader)),    
+    chain(promptUser(reader)),
     // Lift effect into an IO
     IO.of,
     // Effectul function
@@ -57,32 +57,14 @@ const promptUser = reader => () => IO.of(reader.prompt)
 
 const listenMessages = on('message', handleMessage)
 
-/*
-//
-//     rl.on('line', function (data) {
-//       ws.send(composeMessage(name, data.toString().trim()))
-//       rl.prompt()
-//     })
-//      .on('close', function() {
-//       logMsg('Have a great day!')
-//       process.exit(0)
-//     })
-//     rl.prompt()
-*/
-
 const handleOpen = curry((name, reader, ws) => {
 
-  // I could use flip with the original
+  // TODO: I could use flip with the original
   const on = curry((event, handle, handler) => handle.on(event, handler))
 
   return function open() { // Note: Could not use curry when calling a no-arg function at the end
     IO.of(on('close', reader))
-       .ap(IO.of(() =>
-         {
-           //logMsg('Have a great day!')
-           process.exit(0)
-         }
-       ))
+       .ap(IO.of(() => process.exit(0)))
        .runIO()
 
     IO.of(on('line', reader))

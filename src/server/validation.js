@@ -30,8 +30,8 @@ export const isBlacklisted = obj =>
 //      .ap(notEmpty(obj))
 //      .ap(isBlacklisted(obj))
 
-const transduce = transducer(
+const validateMessage = transducer(
    Success(x => y => w => z => z),
    [notNull, hasShape, notEmpty, isBlacklisted]
 )
-export default transduce
+export default validateMessage

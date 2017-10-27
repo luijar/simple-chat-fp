@@ -1,6 +1,5 @@
 import commandLineArgs from 'command-line-args'
 import usage from 'command-line-usage'
-import color from 'cli-color'
 import Maybe from 'data.Maybe'
 import startClient from './client/client'
 import startServer from './server/server'
