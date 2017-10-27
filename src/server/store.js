@@ -1,6 +1,6 @@
 import { createStore } from 'redux'
 
-const initialState = {history: [], users: []}
+const initialState = {history: [], users: []} // If data is large, it's best to use an immutable-js data structure
 
 const ADD_HISTORY = 'ADD_HISTORY',
       ADD_USER    = 'ADD_USER'
