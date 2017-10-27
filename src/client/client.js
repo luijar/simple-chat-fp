@@ -42,8 +42,7 @@ const handleMessage = connection =>
     // Run the effect
     IO.runIO,
     // At the end prompt the user using the configured CLI reader
-    chain(promptUser(reader)),
-    // tap(io => console.log('Debug', io)),
+    chain(promptUser(reader)),    
     // Lift effect into an IO
     IO.of,
     // Effectul function
