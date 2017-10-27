@@ -1,13 +1,18 @@
 /**
  * Module containing utility (helper) functions
  */
-import { curry, identity } from 'ramda'
+import { curry, identity, applyTo } from 'ramda'
 
 export const prettyDate = timeMs => (new Date(timeMs)).toString()
 
 export function foldM(M) {
+  // TODO: Check M has monoid contract
   return arr =>
     arr.reduce((acc, m) => acc.concat(m), M.empty())
+}
+
+export function transducer(reducer, init, transformers) {
+  return val => transformers.map(applyTo(val)).reduce(reducer, init)
 }
 
 export const orElse = f => F => F.orElse(f)

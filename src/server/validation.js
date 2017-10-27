@@ -6,19 +6,19 @@ const blackList = [
 
 ]
 
-const notNull = obj =>
+export const notNull = obj =>
    obj ?  Success(obj)
        :  Failure(["Expecting non-null message object"])
 
-const hasShape = ({name, msg}) =>
-    (name && msg) ?  Success({name, msg})
-                :  Failure(["Expecting message to have both 'name' and 'msg' properties"])
+export const hasShape = ({name, msg}) =>
+    (name && msg) ? Success({name, msg})
+                :   Failure(["Expecting message to have both 'name' and 'msg' properties"])
 
-const notEmpty = ({msg}) =>
+export const notEmpty = ({msg}) =>
   msg.length > 0 ?  Success(msg)
                  :  Failure(["Ignoring empty message"])
 
-const isBlacklisted = ({msg}) =>
+export const isBlacklisted = ({msg}) =>
   !blackList.includes(msg) ? Success(msg)
                            : Failure(["Skipping forbidden word"])
 

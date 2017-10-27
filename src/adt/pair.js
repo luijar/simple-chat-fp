@@ -25,7 +25,6 @@ export const typeOf = T => tap(fork(typeErr, type, is(T)))
 // contractOf :: String -> a -> a | Error
 export const contractOf = c => tap(compose(contractErr(c), has(c), Object.getPrototypeOf))
 
-
 // Typed 2-tuple (pair) of monoids
 // Pair :: (A, B) -> (a, b) -> Object
 export const Pair = (A, B) => (left, right) =>
