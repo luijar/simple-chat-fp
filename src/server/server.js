@@ -5,6 +5,7 @@ import { store, addHistory } from './store'
 import isMessageValid from './validation'
 import HistoryLog from './history'
 import IO from 'io-monad'
+import { Success } from 'data.validation'
 
 /**
 * Chat Server
@@ -25,6 +26,9 @@ export default curry((port, name) =>
     initServer
   )(port)
 )
+
+// Perhaps uses a Lense to map over the Success?
+//Success.get = s => console.log(s) + s.fold(null, identity)
 
 const send = curry((msg, connection) => connection.send(composeMessage('server', msg)) || msg)
 

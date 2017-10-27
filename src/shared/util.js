@@ -11,8 +11,9 @@ export function foldM(M) {
     arr.reduce((acc, m) => acc.concat(m), M.empty())
 }
 
-export function transducer(reducer, init, transformers) {
-  return val => transformers.map(applyTo(val)).reduce(reducer, init)
+export function transducer(applicative, transformers) {
+  // TODO: Check contract has applicative contract
+  return val => transformers.map(applyTo(val)).reduce((acc, a) => acc.ap(a), applicative)
 }
 
 export const orElse = f => F => F.orElse(f)
