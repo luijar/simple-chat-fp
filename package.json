@@ -47,7 +47,7 @@
     "ramda": "^0.25.0",
     "redux": "^3.7.2",
     "rxjs": "5.2.0",
-    "ws": "^3.2.0"
+    "ws": "^3.3.1"
   },
   "scripts": {
     "test": "mocha --recursive --compilers js:babel-register --require babel-polyfill",
