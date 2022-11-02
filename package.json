@@ -19,7 +19,7 @@
     "babel-preset-env": "^1.6.0",
     "chai": "4.1.0",
     "eslint": "^4.18.2",
-    "jscs": "^2.1.1",
+    "jscs": "^3.0.7",
     "jsdom": "^6.5.1",
     "json-loader": "^0.5.4",
     "mocha": "^3.2.0",
